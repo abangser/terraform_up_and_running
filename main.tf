@@ -1,12 +1,17 @@
 provider "aws" {
-  region 		= "us-east-1"
+  region        = "us-east-1"
 }
 
-resource "aws_instance" "example" {
-  ami			= "ami-40d28157"
-  instance_type = "t2.micro"
+resource "aws_elb" "example" {
+  name                = "terraform-asg-example"
+  security_groups     = ["${aws_security_group.instance.id}"]
+  availability_zones  = ["${data.aws_availability_zones.all.names}"]
 
-  tags {
-  	name 		= "terraform-example"
+  listener {
+    lb_port           = 80
+    lb_protocol       = "http"
+    instance_port     = "${var.server_port}"
+    instance_protocol = "http"
   }
 }
+
